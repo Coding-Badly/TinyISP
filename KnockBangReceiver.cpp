@@ -170,10 +170,11 @@ static volatile uint8_t knb_init_byte asm("knb_init_byte") __attribute__ ((used)
 static volatile uint8_t knb_overrun asm("knb_overrun") __attribute__ ((used));
 
 static const uint8_t knb_ring_buffer_size = 128; // 64;
-static volatile uint8_t knb_ring_space asm("knb_ring_space") __attribute__ ((used));
-static volatile uint8_t knb_ring_head asm("knb_ring_head") __attribute__ ((used));
+/*static*/ volatile uint8_t knb_ring_space asm("knb_ring_space") __attribute__ ((used));
+/*static*/ volatile uint8_t knb_ring_head asm("knb_ring_head") __attribute__ ((used));
 static uint8_t knb_ring_tail;
 static volatile uint8_t knb_ring_buffer[knb_ring_buffer_size] asm("knb_ring_buffer") __attribute__ ((used));
+/*static*/ volatile uint8_t kbr_fault_code asm("kbr_fault_code") __attribute__ ((used));
 
 
 /*==============================================================================
@@ -646,13 +647,12 @@ bool KnockBangReceive_getStats( kbr_stats_t & stats )
 
 uint8_t KnockBangReceive_getLastFault( void )
 {
-  static volatile uint8_t f asm("kbr_fault_code");
   uint8_t rv;
 
   ATOMIC_BLOCK( ATOMIC_RESTORESTATE )
   {
-    rv = f;
-    f = 0;
+    rv = kbr_fault_code;
+    kbr_fault_code = 0;
   }
 
   return( rv );
